@@ -46,10 +46,12 @@
         body::before,
         body::after {
             content: '';
-            position: absolute;
+            position: fixed;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             animation: float 20s infinite ease-in-out;
+            pointer-events: none;
+            z-index: 0;
         }
 
         body::before {
