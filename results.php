@@ -216,6 +216,32 @@ $flash = getFlashMessage();
             background: #d1d5db;
         }
 
+        .nav-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+
+        .btn-home {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-home:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
         .table-card {
             background: white;
             border-radius: 16px;
@@ -412,6 +438,9 @@ $flash = getFlashMessage();
 </head>
 <body>
     <div class="container">
+        <div class="nav-bar">
+            <a href="index.php" class="btn-home">&#8592; Kembali ke Utama</a>
+        </div>
         <div class="header">
             <h1>Senarai Kehadiran</h1>
             <p>Majlis Pengurusan Komuniti Kampung</p>
