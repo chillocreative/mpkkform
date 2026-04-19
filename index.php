@@ -386,6 +386,55 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        .success-screen {
+            text-align: center;
+            padding: 24px 8px 8px;
+            animation: slideDown 0.4s ease-out;
+        }
+
+        .success-icon {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: #d1fae5;
+            color: #059669;
+            font-size: 48px;
+            line-height: 88px;
+            font-weight: 700;
+        }
+
+        .success-title {
+            font-size: 26px;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .success-message {
+            font-size: 15px;
+            color: var(--text-secondary);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .btn-home {
+            display: inline-block;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        }
     </style>
 </head>
 <body>
@@ -398,16 +447,30 @@
             
             <div class="card-body">
                 <?php
+                $flashMessage = null;
+                $flashType = null;
                 if (isset($_SESSION['flash_message'])) {
-                    $type = $_SESSION['flash_type'] ?? 'success';
-                    echo '<div class="alert alert-' . $type . '">';
-                    echo htmlspecialchars($_SESSION['flash_message']);
-                    echo '</div>';
+                    $flashType = $_SESSION['flash_type'] ?? 'success';
+                    $flashMessage = $_SESSION['flash_message'];
                     unset($_SESSION['flash_message']);
                     unset($_SESSION['flash_type']);
                 }
+                $showSuccessScreen = ($flashType === 'success');
+                if ($flashMessage && !$showSuccessScreen) {
+                    echo '<div class="alert alert-' . htmlspecialchars($flashType) . '">';
+                    echo htmlspecialchars($flashMessage);
+                    echo '</div>';
+                }
                 ?>
 
+                <?php if ($showSuccessScreen): ?>
+                    <div class="success-screen">
+                        <div class="success-icon">&#10003;</div>
+                        <h2 class="success-title">Terima Kasih!</h2>
+                        <p class="success-message"><?= htmlspecialchars($flashMessage) ?></p>
+                        <a href="index.php" class="btn-home">Kembali ke Utama</a>
+                    </div>
+                <?php else: ?>
                 <form id="attendanceForm" method="POST" action="submit.php">
                     <div class="form-group">
                         <label class="form-label" for="nama">
@@ -506,6 +569,7 @@
                         <span class="btn-text">Hantar Pengesahan</span>
                     </button>
                 </form>
+                <?php endif; ?>
             </div>
         </div>
 
