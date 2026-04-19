@@ -34,7 +34,7 @@ if (empty($mpkk)) {
     $errors[] = 'Sila pilih MPKK';
 }
 
-$valid_jawatan = ['Pengerusi', 'Setiausaha', 'Bendahari'];
+$valid_jawatan = ['Pengerusi', 'Setiausaha', 'Bendahari', 'Ahli Jawatankuasa'];
 if (empty($jawatan) || !in_array($jawatan, $valid_jawatan)) {
     $errors[] = 'Sila pilih jawatan yang sah';
 }
