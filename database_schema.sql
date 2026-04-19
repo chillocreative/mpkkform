@@ -5,6 +5,8 @@ CREATE TABLE IF NOT EXISTS `mpkk_attendance` (
     `no_telefon` VARCHAR(20) NOT NULL,
     `mpkk` VARCHAR(255) NOT NULL,
     `jawatan` VARCHAR(100) NOT NULL,
+    `status` VARCHAR(20) NOT NULL DEFAULT 'Hadir',
+    `sebab_tidak_hadir` TEXT NULL,
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     INDEX `idx_mpkk` (`mpkk`),
     INDEX `idx_created_at` (`created_at`)

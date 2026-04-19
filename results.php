@@ -374,6 +374,35 @@ $flash = getFlashMessage();
             display: inline-block;
         }
 
+        .status-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-hadir {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-tidak-hadir {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .reason-text {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+            max-width: 240px;
+            white-space: normal;
+        }
+
         /* Checkbox styling */
         input[type="checkbox"] {
             width: 18px;
@@ -557,17 +586,23 @@ $flash = getFlashMessage();
                                     <th>No. Telefon</th>
                                     <th>MPKK</th>
                                     <th>Jawatan</th>
+                                    <th>Status</th>
                                     <th>Tarikh & Masa</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <?php foreach ($records as $index => $record): ?>
+                                    <?php
+                                        $recStatus = $record['status'] ?? 'Hadir';
+                                        $isTidakHadir = $recStatus === 'Tidak Hadir';
+                                        $badgeClass = $isTidakHadir ? 'status-tidak-hadir' : 'status-hadir';
+                                    ?>
                                     <tr>
                                         <td class="checkbox-cell">
-                                            <input 
-                                                type="checkbox" 
-                                                name="selected_ids[]" 
-                                                value="<?= $record['id'] ?>" 
+                                            <input
+                                                type="checkbox"
+                                                name="selected_ids[]"
+                                                value="<?= $record['id'] ?>"
                                                 class="record-checkbox"
                                                 onchange="updateSelectedCount()"
                                             >
@@ -578,6 +613,12 @@ $flash = getFlashMessage();
                                         <td><?= htmlspecialchars($record['no_telefon']) ?></td>
                                         <td><?= htmlspecialchars($record['mpkk']) ?></td>
                                         <td><?= htmlspecialchars($record['jawatan']) ?></td>
+                                        <td>
+                                            <span class="status-badge <?= $badgeClass ?>"><?= htmlspecialchars($recStatus) ?></span>
+                                            <?php if ($isTidakHadir && !empty($record['sebab_tidak_hadir'])): ?>
+                                                <span class="reason-text">Sebab: <?= htmlspecialchars($record['sebab_tidak_hadir']) ?></span>
+                                            <?php endif; ?>
+                                        </td>
                                         <td><?= date('d/m/Y h:i A', strtotime($record['created_at'])) ?></td>
                                     </tr>
                                 <?php endforeach; ?>

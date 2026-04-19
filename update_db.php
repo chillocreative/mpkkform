@@ -21,39 +21,46 @@ if (file_exists('database.php')) {
     }
 }
 
-try {
-    // Check if column exists
+function columnExists($conn, $dbname, $table, $column) {
     $stmt = $conn->prepare("
-        SELECT COUNT(*) 
-        FROM information_schema.COLUMNS 
-        WHERE TABLE_SCHEMA = :dbname 
-        AND TABLE_NAME = 'mpkk_attendance' 
-        AND COLUMN_NAME = 'no_ic'
+        SELECT COUNT(*)
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = :dbname
+        AND TABLE_NAME = :table
+        AND COLUMN_NAME = :column
     ");
-    
-    // We need to get the actual database name from the connection if possible,
-    // or use the one defined/from config.
-    $current_db = $conn->query('select database()')->fetchColumn();
-    
-    $stmt->execute([':dbname' => $current_db]);
-    $column_exists = $stmt->fetchColumn();
+    $stmt->execute([
+        ':dbname' => $dbname,
+        ':table' => $table,
+        ':column' => $column,
+    ]);
+    return (bool)$stmt->fetchColumn();
+}
 
-    if (!$column_exists) {
-        // Add the column
-        $sql = "ALTER TABLE mpkk_attendance ADD COLUMN no_ic VARCHAR(20) NOT NULL AFTER nama";
-        $conn->exec($sql);
-        echo "<div style='color: green; font-family: sans-serif; padding: 20px; border: 1px solid green; background: #eaffea; border-radius: 5px; margin: 20px;'>";
-        echo "✅ SUCCESS: Column 'no_ic' has been successfully added to the database.<br>";
-        echo "You can now submit the form.";
-        echo "</div>";
-    } else {
-        echo "<div style='color: blue; font-family: sans-serif; padding: 20px; border: 1px solid blue; background: #eaf4ff; border-radius: 5px; margin: 20px;'>";
-        echo "ℹ️ INFO: Column 'no_ic' already exists. No changes needed.";
-        echo "</div>";
+function renderBox($color, $bg, $message) {
+    echo "<div style='color: {$color}; font-family: sans-serif; padding: 20px; border: 1px solid {$color}; background: {$bg}; border-radius: 5px; margin: 20px;'>";
+    echo $message;
+    echo "</div>";
+}
+
+try {
+    $current_db = $conn->query('select database()')->fetchColumn();
+
+    $migrations = [
+        ['column' => 'no_ic', 'sql' => "ALTER TABLE mpkk_attendance ADD COLUMN no_ic VARCHAR(20) NOT NULL AFTER nama"],
+        ['column' => 'status', 'sql' => "ALTER TABLE mpkk_attendance ADD COLUMN status VARCHAR(20) NOT NULL DEFAULT 'Hadir'"],
+        ['column' => 'sebab_tidak_hadir', 'sql' => "ALTER TABLE mpkk_attendance ADD COLUMN sebab_tidak_hadir TEXT NULL"],
+    ];
+
+    foreach ($migrations as $migration) {
+        if (!columnExists($conn, $current_db, 'mpkk_attendance', $migration['column'])) {
+            $conn->exec($migration['sql']);
+            renderBox('green', '#eaffea', "✅ SUCCESS: Column '{$migration['column']}' has been added.");
+        } else {
+            renderBox('blue', '#eaf4ff', "ℹ️ INFO: Column '{$migration['column']}' already exists. No changes needed.");
+        }
     }
 
 } catch(PDOException $e) {
-    echo "<div style='color: red; font-family: sans-serif; padding: 20px; border: 1px solid red; background: #ffeaea; border-radius: 5px; margin: 20px;'>";
-    echo "❌ ERROR: " . $e->getMessage();
-    echo "</div>";
+    renderBox('red', '#ffeaea', "❌ ERROR: " . htmlspecialchars($e->getMessage()));
 }

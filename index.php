@@ -271,6 +271,70 @@
             display: block;
         }
 
+        .status-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .status-btn {
+            padding: 14px 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            color: var(--text-primary);
+            background: white;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+
+        .status-btn:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .status-btn.active[data-status="Hadir"] {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+
+        .status-btn.active[data-status="Tidak Hadir"] {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea.error {
+            border-color: var(--danger);
+        }
+
         .btn-submit {
             width: 100%;
             padding: 16px;
@@ -565,6 +629,31 @@
                         <div class="error-message" id="jawatan-error">Sila pilih jawatan anda</div>
                     </div>
 
+                    <div class="form-group">
+                        <label class="form-label">
+                            Status Kehadiran <span class="required">*</span>
+                        </label>
+                        <div class="status-group">
+                            <button type="button" class="status-btn" data-status="Hadir" id="btnHadir">Hadir</button>
+                            <button type="button" class="status-btn" data-status="Tidak Hadir" id="btnTidakHadir">Tidak Hadir</button>
+                        </div>
+                        <input type="hidden" id="status" name="status" value="">
+                        <div class="error-message" id="status-error">Sila pilih status kehadiran</div>
+                    </div>
+
+                    <div class="form-group" id="sebabGroup" style="display: none;">
+                        <label class="form-label" for="sebab_tidak_hadir">
+                            Nyatakan sebab tidak hadir <span class="required">*</span>
+                        </label>
+                        <textarea
+                            id="sebab_tidak_hadir"
+                            name="sebab_tidak_hadir"
+                            class="form-textarea"
+                            placeholder="Contoh: Bertugas di luar kawasan"
+                        ></textarea>
+                        <div class="error-message" id="sebab-error">Sila nyatakan sebab tidak hadir</div>
+                    </div>
+
                     <button type="submit" class="btn-submit" id="submitBtn">
                         <span class="btn-text">Hantar Pengesahan</span>
                     </button>
@@ -584,7 +673,30 @@
         const telefonInput = document.getElementById('no_telefon');
         const mpkkSelect = document.getElementById('mpkk');
         const jawatanSelect = document.getElementById('jawatan');
+        const statusInput = document.getElementById('status');
+        const btnHadir = document.getElementById('btnHadir');
+        const btnTidakHadir = document.getElementById('btnTidakHadir');
+        const sebabGroup = document.getElementById('sebabGroup');
+        const sebabInput = document.getElementById('sebab_tidak_hadir');
         const submitBtn = document.getElementById('submitBtn');
+
+        function setStatus(value) {
+            statusInput.value = value;
+            btnHadir.classList.toggle('active', value === 'Hadir');
+            btnTidakHadir.classList.toggle('active', value === 'Tidak Hadir');
+            if (value === 'Tidak Hadir') {
+                sebabGroup.style.display = '';
+            } else {
+                sebabGroup.style.display = 'none';
+                sebabInput.value = '';
+                sebabInput.classList.remove('error');
+                document.getElementById('sebab-error').classList.remove('show');
+            }
+            document.getElementById('status-error').classList.remove('show');
+        }
+
+        btnHadir.addEventListener('click', () => setStatus('Hadir'));
+        btnTidakHadir.addEventListener('click', () => setStatus('Tidak Hadir'));
 
         // Auto-uppercase for nama
         namaInput.addEventListener('input', function(e) {
@@ -647,6 +759,24 @@
                 hideError('jawatan');
             }
 
+            // Validate status
+            if (statusInput.value !== 'Hadir' && statusInput.value !== 'Tidak Hadir') {
+                document.getElementById('status-error').classList.add('show');
+                isValid = false;
+            }
+
+            // Validate sebab when Tidak Hadir
+            if (statusInput.value === 'Tidak Hadir') {
+                if (sebabInput.value.trim() === '') {
+                    sebabInput.classList.add('error');
+                    document.getElementById('sebab-error').classList.add('show');
+                    isValid = false;
+                } else {
+                    sebabInput.classList.remove('error');
+                    document.getElementById('sebab-error').classList.remove('show');
+                }
+            }
+
             if (!isValid) {
                 e.preventDefault();
                 return false;
@@ -678,6 +808,11 @@
                 const errorId = this.id === 'no_telefon' ? 'telefon-error' : (this.id === 'no_ic' ? 'ic-error' : this.id + '-error');
                 document.getElementById(errorId).classList.remove('show');
             });
+        });
+
+        sebabInput.addEventListener('input', function() {
+            this.classList.remove('error');
+            document.getElementById('sebab-error').classList.remove('show');
         });
     </script>
 </body>
