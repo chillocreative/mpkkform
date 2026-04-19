@@ -497,6 +497,7 @@
                             <option value="Pengerusi">Pengerusi</option>
                             <option value="Setiausaha">Setiausaha</option>
                             <option value="Bendahari">Bendahari</option>
+                            <option value="Ahli Jawatankuasa">Ahli Jawatankuasa</option>
                         </select>
                         <div class="error-message" id="jawatan-error">Sila pilih jawatan anda</div>
                     </div>
