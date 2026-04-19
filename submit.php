@@ -68,7 +68,7 @@ try {
     
 } catch(PDOException $e) {
     // Set error message
-    setFlashMessage('Ralat: Gagal menyimpan data. Sila cuba lagi.', 'error');
+    setFlashMessage('Ralat: ' . $e->getMessage(), 'error');
     header('Location: index.php');
     exit;
 }
